@@ -6,6 +6,7 @@ class LineObject : public GraphicObject{
         LineObject(int x1, int y1, int x2, int y2);
         void draw(QPainter& painter) override;
         bool contains(const QPoint& point) const override;
+        void moveBy(int dx, int dy) override;
     private:
         int x1;
         int y1;

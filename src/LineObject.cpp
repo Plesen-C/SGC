@@ -22,3 +22,9 @@ bool LineObject::contains(const QPoint& point) const{
     const double distY = point.y() - closestY;
     return (distX * distX + distY * distY) <= 36;
 }
+void LineObject::moveBy(int dx, int dy){
+    x1 += dx;
+    y1 += dy;
+    x2 += dx;
+    y2 += dy;
+}
