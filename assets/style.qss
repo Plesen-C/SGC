@@ -1,0 +1,223 @@
+/* =========================================================
+   SGC :: TERMINAL HUD
+   ========================================================= */
+
+QMainWindow {
+    background: #050505;
+    color: #b8b8b8;
+    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: 12px;
+}
+
+
+/* =========================
+   MENU BAR
+   ========================= */
+
+QMenuBar {
+    background: #070707;
+    color: #888888;
+    border: none;
+    border-bottom: 1px solid #252525;
+    padding: 2px 6px;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 11px;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 4px 10px;
+}
+
+QMenuBar::item:selected {
+    background: #161616;
+    color: #d0d0d0;
+}
+
+
+/* =========================
+   MENUS
+   ========================= */
+
+QMenu {
+    background: #090909;
+    color: #a8a8a8;
+    border: 1px solid #303030;
+    padding: 3px;
+}
+
+QMenu::item {
+    padding: 5px 28px 5px 12px;
+}
+
+QMenu::item:selected {
+    background: #1c1c1c;
+    color: #eeeeee;
+}
+
+
+/* =========================
+   TOOLBAR
+   ========================= */
+
+QToolBar {
+    background: #070707;
+    border: none;
+    border-bottom: 1px solid #252525;
+    padding: 3px 5px;
+    spacing: 2px;
+}
+
+QToolButton {
+    background: transparent;
+    color: #777777;
+    border: 1px solid transparent;
+    padding: 4px 9px;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 11px;
+}
+
+QToolButton:hover {
+    background: #111111;
+    border: 1px solid #303030;
+    color: #c8c8c8;
+}
+
+QToolButton:checked {
+    background: #181818;
+    border: 1px solid #555555;
+    color: #eeeeee;
+}
+
+
+/* =========================
+   DOCK
+   ========================= */
+
+QDockWidget {
+    background: #080808;
+    color: #8f8f8f;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 11px;
+}
+
+QDockWidget::title {
+    background: #080808;
+    color: #8f8f8f;
+    text-align: left;
+    padding: 6px 9px;
+    border: none;
+    border-bottom: 1px solid #292929;
+    font-weight: normal;
+}
+
+
+/* =========================
+   OBJECT LIST
+   ========================= */
+
+QListWidget {
+    background: #080808;
+    color: #858585;
+    border: none;
+    outline: none;
+    padding: 5px 0;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 11px;
+}
+
+QListWidget::item {
+    background: transparent;
+    padding: 5px 9px;
+    border: none;
+}
+
+QListWidget::item:hover {
+    background: #111111;
+    color: #c0c0c0;
+}
+
+QListWidget::item:selected {
+    background: #171717;
+    color: #eeeeee;
+    border-left: 2px solid #aaaaaa;
+}
+
+
+/* =========================
+   STATUS BAR
+   ========================= */
+
+QStatusBar {
+    background: #070707;
+    color: #777777;
+    border: none;
+    border-top: 1px solid #252525;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 10px;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+
+/* =========================
+   SCROLLBARS
+   ========================= */
+
+QScrollBar:vertical {
+    background: #080808;
+    width: 7px;
+    border: none;
+}
+
+QScrollBar::handle:vertical {
+    background: #292929;
+    min-height: 18px;
+    border: none;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #444444;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QScrollBar:horizontal {
+    background: #080808;
+    height: 7px;
+    border: none;
+}
+
+QScrollBar::handle:horizontal {
+    background: #292929;
+    min-width: 18px;
+    border: none;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #444444;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+
+
+/* =========================
+   TOOLTIP
+   ========================= */
+
+QToolTip {
+    background: #090909;
+    color: #bdbdbd;
+    border: 1px solid #404040;
+    padding: 4px;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 10px;
+}

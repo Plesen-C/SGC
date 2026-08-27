@@ -3,16 +3,14 @@
 #include "LineObject.h"
 #include "RectangleObject.h"
 #include <QPainter>
+#include <QMenu>
 #include <memory>
 #include <qcolor.h>
 #include <qevent.h>
 #include <qnamespace.h>
 #include <qpoint.h>
-Canvas::Canvas(QWidget * parent) : QWidget(parent){
-    objects.push_back(std::make_unique<LineObject>(30,250,120,120));
-    objects.push_back(std::make_unique<RectangleObject>(500,150,200,80));
-    objects.push_back(std::make_unique<RectangleObject>(700,400,100,150));
-}
+
+Canvas::Canvas(QWidget * parent) : QWidget(parent){setFocusPolicy(Qt::StrongFocus);}
 void Canvas::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     painter.fillRect(rect(),Qt::black);
@@ -27,27 +25,28 @@ void Canvas::paintEvent(QPaintEvent *event){
         painter.drawLine(0,y,width(),y);
     }
     QPen pen;
-    pen.setColor(Qt::green);
-    pen.setWidth(3);
-    painter.setPen(pen);
-    painter.drawLine(100,200,200,200);
-    pen.setColor(Qt::cyan);
-    pen.setWidth(2);
-    painter.setPen(pen);
+    painter.translate(canvasOffset);
     for (const auto& object : objects){
         object -> draw(painter);//sex
     }
 }
 void Canvas::mousePressEvent(QMouseEvent *event){
-    if(event->button() != Qt::LeftButton)
+    if(event->button() == Qt::RightButton){
+        panning = true;
+        panStart = event->pos();
+        rightClickStart = event->pos();
         return;
-    const QPoint position = event->pos();
+    }
+    if(event->button() != Qt::LeftButton){
+        setFocus();
+        return;
+    }
+    const QPoint position = event->pos() - canvasOffset;
     draggedObject = nullptr;
     resizedRectangle = nullptr;
     resizedHandle = 0;
     for (auto& object : objects)
         object -> setSelected(0);
-    
     for (auto it = objects.rbegin(); it != objects.rend(); ++it)
 {
     auto* rectangle = dynamic_cast<RectangleObject*>(it->get());
@@ -55,27 +54,21 @@ void Canvas::mousePressEvent(QMouseEvent *event){
     if (rectangle)
     {
         const int handle = rectangle->handleAt(position);
-
         if (handle != 0)
         {
             rectangle->setSelected(true);
-
             resizedRectangle = rectangle;
             resizedHandle = handle;
             lastMousePosition = position;
-
             update();
             return;
         }
     }
-
     if ((*it)->contains(position))
     {
         (*it)->setSelected(true);
-
         draggedObject = it->get();
         lastMousePosition = position;
-
         update();
         return;
     }
@@ -85,8 +78,16 @@ update();
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *event){
+    if (panning) {
+        const QPoint currentPosition = event->pos();
+        const QPoint delta = currentPosition - panStart;
+        canvasOffset += delta;
+        panStart = currentPosition;
+        update();
+        return;
+    }
     
-    const QPoint currentPosition = event->pos();
+    const QPoint currentPosition = event->pos()- canvasOffset;
     const int dx = currentPosition.x() - lastMousePosition.x();
     const int dy = currentPosition.y() - lastMousePosition.y();
     if (resizedRectangle){
@@ -96,7 +97,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event){
         return;
     }
     if (draggedObject){
-        draggedObject -> moveBy(dx, dy);
+        draggedObject -> moveBy(dx,dy);
         lastMousePosition = currentPosition;
         update();
         
@@ -104,10 +105,75 @@ void Canvas::mouseMoveEvent(QMouseEvent *event){
     update();
 }
 void Canvas::mouseReleaseEvent(QMouseEvent *event){
+if (event->button() == Qt::RightButton)
+{
+    panning = false;
+    const QPoint delta = event->pos() - rightClickStart;
+    if (delta.manhattanLength() < 5)
+    {
+        QMenu menu(this);
+        QAction* rectangleAction = menu.addAction("Rectangle");
+        QAction* lineAction = menu.addAction("Line");
+        QAction* selectedAction = menu.exec(event->globalPosition().toPoint());
+        if (selectedAction == rectangleAction)
+        {
+            QPoint pos = event->pos() - canvasOffset;
+            for (auto& object : objects)
+                object->setSelected(false);
+            auto rectangle = std::make_unique<RectangleObject>(pos.x()-25,pos.y()-25,50,50);
+            rectangle->setSelected(true);
+            objects.push_back(std::move(rectangle));
+            emit objectsChanged();
+            update();
+        }
+        else if (selectedAction == lineAction)
+        {
+            qDebug() << "Create Line";
+        }
+    }
+    return;
+}
     if(event->button() == Qt::LeftButton)
     {
         draggedObject = nullptr;
         resizedRectangle = nullptr;
         resizedHandle =0;
     }
+}
+void Canvas::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Delete)
+    {
+        for (auto it = objects.begin(); it != objects.end(); )
+        {
+            if ((*it)->isSelected())
+                it = objects.erase(it);
+            else
+                ++it;
+        }
+
+        update();
+        return;
+    }
+
+    QWidget::keyPressEvent(event);
+}
+int Canvas::objectCount() const
+{
+    return static_cast<int>(objects.size());
+}
+GraphicObject* Canvas::objectAt(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(objects.size()))
+        return nullptr;
+
+    return objects[index].get();
+}
+void Canvas::selectObject(int index)
+{
+    for (int i = 0; i < static_cast<int>(objects.size()); ++i)
+    {
+        objects[i]->setSelected(i == index);
+    }
+    update();
 }
