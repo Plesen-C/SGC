@@ -57,6 +57,7 @@ void Canvas::mousePressEvent(QMouseEvent *event){
         if (handle != 0)
         {
             rectangle->setSelected(true);
+            emit objectsChanged();
             resizedRectangle = rectangle;
             resizedHandle = handle;
             lastMousePosition = position;
@@ -67,6 +68,7 @@ void Canvas::mousePressEvent(QMouseEvent *event){
     if ((*it)->contains(position))
     {
         (*it)->setSelected(true);
+        emit objectsChanged();
         draggedObject = it->get();
         lastMousePosition = position;
         update();
@@ -140,20 +142,86 @@ if (event->button() == Qt::RightButton)
         resizedHandle =0;
     }
 }
-void Canvas::keyPressEvent(QKeyEvent* event)
+void Canvas::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Delete)
+    const int count = objectCount();
+
+    switch (event->key())
     {
-        for (auto it = objects.begin(); it != objects.end(); )
+        case Qt::Key_Down:
         {
-            if ((*it)->isSelected())
-                it = objects.erase(it);
+            if (count == 0)
+                return;
+
+            int index = selectedObjectIndex();
+
+            if (index < 0)
+                index = count - 1;
             else
-                ++it;
+                index--;
+
+            if (index < 0)
+                index = count - 1;
+
+            selectObject(index);
+            return;
         }
 
-        update();
-        return;
+        case Qt::Key_Up:
+        {
+            if (count == 0)
+                return;
+
+            int index = selectedObjectIndex();
+
+            if (index < 0)
+                index = 0;
+            else
+                index++;
+
+            if (index >= count)
+                index = 0;
+
+            selectObject(index);
+            return;
+        }
+
+        case Qt::Key_Delete:
+        {
+            for (auto it = objects.begin(); it != objects.end();)
+            {
+                if ((*it)->isSelected())
+                    it = objects.erase(it);
+                else
+                    ++it;
+            }
+
+            emit objectsChanged();
+            update();
+            return;
+        }
+
+        case Qt::Key_Escape:
+        {
+            for (auto &object : objects)
+                object->setSelected(false);
+
+            emit objectsChanged();
+            update();
+            return;
+        }
+
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+        {
+            if (count > 0 && selectedObjectIndex() < 0)
+                selectObject(0);
+
+            return;
+        }
+
+        default:
+            break;
     }
 
     QWidget::keyPressEvent(event);
@@ -169,11 +237,25 @@ GraphicObject* Canvas::objectAt(int index) const
 
     return objects[index].get();
 }
+int Canvas::selectedObjectIndex() const
+{
+    for (int i = 0; i < objectCount(); ++i)
+    {
+        if (objects[i]->isSelected())
+            return i;
+    }
+
+    return -1;
+}
+
 void Canvas::selectObject(int index)
 {
-    for (int i = 0; i < static_cast<int>(objects.size()); ++i)
-    {
+    if (index < 0 || index >= objectCount())
+        return;
+
+    for (int i = 0; i < objectCount(); ++i)
         objects[i]->setSelected(i == index);
-    }
+
+    emit objectsChanged();
     update();
 }
