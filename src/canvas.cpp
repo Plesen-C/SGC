@@ -117,21 +117,25 @@ if (event->button() == Qt::RightButton)
         QAction* rectangleAction = menu.addAction("Rectangle");
         QAction* lineAction = menu.addAction("Line");
         QAction* selectedAction = menu.exec(event->globalPosition().toPoint());
-        if (selectedAction == rectangleAction)
-        {
-            QPoint pos = event->pos() - canvasOffset;
-            for (auto& object : objects)
-                object->setSelected(false);
-            auto rectangle = std::make_unique<RectangleObject>(pos.x()-25,pos.y()-25,50,50);
-            rectangle->setSelected(true);
-            objects.push_back(std::move(rectangle));
-            emit objectsChanged();
-            update();
-        }
-        else if (selectedAction == lineAction)
-        {
-            qDebug() << "Create Line";
-        }
+    if (selectedAction == rectangleAction)
+    {
+        QPoint pos = event->pos() - canvasOffset;
+        createRectangle(pos);
+    }
+    else if (selectedAction == lineAction)
+    {
+        QPoint pos = event->pos() - canvasOffset;
+
+        for (auto& object : objects)
+            object->setSelected(false);
+
+        auto line = std::make_unique<LineObject>(pos.x() - 25, pos.y() - 25, 50,50);
+
+        line->setSelected(true);
+        objects.push_back(std::move(line));
+
+        emit objectsChanged();
+        update();
     }
     return;
 }
@@ -141,6 +145,7 @@ if (event->button() == Qt::RightButton)
         resizedRectangle = nullptr;
         resizedHandle =0;
     }
+}
 }
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
@@ -210,6 +215,17 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             update();
             return;
         }
+        case Qt::Key_PageUp:
+        {
+            moveObjectUp(selectedObjectIndex());
+            return;
+        }
+
+        case Qt::Key_PageDown:
+        {
+            moveObjectDown(selectedObjectIndex());
+            return;
+        }
 
         case Qt::Key_Return:
         case Qt::Key_Enter:
@@ -255,6 +271,38 @@ void Canvas::selectObject(int index)
 
     for (int i = 0; i < objectCount(); ++i)
         objects[i]->setSelected(i == index);
+
+    emit objectsChanged();
+    update();
+}
+void Canvas::moveObjectUp(int index)
+{
+    if (index < 0 || index >= static_cast<int>(objects.size()) - 1)
+        return;
+
+    std::swap(objects[index], objects[index + 1]);
+
+    emit objectsChanged();
+    update();
+}
+void Canvas::moveObjectDown(int index)
+{
+    if (index < 0 || index >= static_cast<int>(objects.size()))
+        return;
+
+    std::swap(objects[index], objects[index - 1]);
+
+    emit objectsChanged();
+    update();
+}
+void Canvas::createRectangle(QPoint position)
+{
+    for (auto& object : objects)
+        object->setSelected(false);
+
+    auto rectangle = std::make_unique<RectangleObject>(position.x() - 25, position.y() - 25, 50, 50);
+    rectangle->setSelected(true);
+    objects.push_back(std::move(rectangle));
 
     emit objectsChanged();
     update();

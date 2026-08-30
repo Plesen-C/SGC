@@ -12,7 +12,7 @@ HUDWidget::HUDWidget(Canvas *canvas, QWidget *parent)
     : QWidget(parent),
       canvas(canvas)
 {
-    setAttribute(Qt::WA_TransparentForMouseEvents);
+    setFocusPolicy(Qt::StrongFocus);
     setAttribute(Qt::WA_TranslucentBackground);
 }
 
@@ -74,9 +74,9 @@ void HUDWidget::paintEvent(QPaintEvent *event)
     );
 
     painter.drawText(
-        right - 130,
+        right - 170,
         margin + 36,
-        "INPUT: KEYBOARD │"
+        "INPUT: KEYBOARD+ MOUSE│"
     );
 
     /*
@@ -128,6 +128,7 @@ void HUDWidget::paintEvent(QPaintEvent *event)
             continue;
 
         const bool selected = (i == selectedIndex);
+        const bool hovered = (i == hoveredAction);
 
         QString type;
 
@@ -138,7 +139,14 @@ void HUDWidget::paintEvent(QPaintEvent *event)
         else
             type = "? OBJECT";
 
-        QString marker = selected ? ">" : " ";
+        QString marker;
+
+        if (selected)
+            marker = ">";
+        else if (hovered)
+            marker = "~";
+        else
+            marker = " ";
 
         painter.drawText(
             margin + 8,
@@ -250,4 +258,85 @@ void HUDWidget::paintEvent(QPaintEvent *event)
         statusY + 36,
         "┘"
     );
+}
+void HUDWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!canvas)
+        return;
+
+    const int margin = 10;
+    const int leftWidth = 400;
+    const int topHeight = 70;
+    const int bottomHeight = 58;
+
+    const int objectsTop = margin + topHeight;
+    const int objectsBottom = height() - margin - bottomHeight;
+
+    const QPoint position = event->position().toPoint();
+
+    int newHoveredAction = -1;
+
+    int y = objectsTop + 25;
+
+    for (int i = canvas->objectCount() - 1; i >= 0; --i)
+    {
+        if (y > objectsBottom - 20)
+            break;
+
+        QRect itemRect(
+            margin,
+            y - 14,
+            leftWidth,
+            16
+        );
+
+        if (itemRect.contains(position))
+        {
+            newHoveredAction = i;
+            break;
+        }
+
+        y += 16;
+    }
+
+    if (hoveredAction != newHoveredAction)
+    {
+        hoveredAction = newHoveredAction;
+        update();
+    }
+}
+void HUDWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (!canvas)
+        return;
+
+    if (event->button() != Qt::LeftButton)
+        return;
+
+    if (hoveredAction >= 0 &&
+        hoveredAction < canvas->objectCount())
+    {
+        canvas->selectObject(hoveredAction);
+        update();
+    }
+}
+
+void HUDWidget::keyPressEvent(QKeyEvent *event)
+{
+    if(!canvas)
+        return;
+    switch (event->key()){
+        case Qt::Key_N:
+            const QPoint position(
+                canvas->width() / 2,
+                canvas->height() / 2
+            );
+            canvas->createRectangle(position);
+            update();
+            break;
+    }
+
+
+
+
 }

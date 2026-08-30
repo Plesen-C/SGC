@@ -16,6 +16,9 @@ class Canvas : public QWidget{
         GraphicObject* objectAt(int index) const;
         void selectObject(int index);
         int selectedObjectIndex() const;
+        void moveObjectUp(int index);
+        void moveObjectDown(int index);
+        void createRectangle(QPoint position);
     protected:
         void paintEvent(QPaintEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
@@ -32,6 +35,7 @@ class Canvas : public QWidget{
         QPoint panStart;
         QPoint rightClickStart;
         QPoint canvasOffset;
+        
     signals:
         void objectSelected(int index);
         void objectsChanged();
