@@ -172,25 +172,6 @@ void HUDWidget::paintEvent(QPaintEvent *event)
         objectsBottom + 15,
         "└──────────────────────────────"
     );
-
-    /*
-     * ─────────────────────────────────────────────
-     * VIEWPORT MARKER
-     * ─────────────────────────────────────────────
-     */
-
-    painter.drawText(
-        margin + leftWidth + 20,
-        objectsTop,
-        "┌─ VIEWPORT"
-    );
-
-    painter.drawText(
-        margin + leftWidth + 20,
-        objectsTop + 20,
-        "│ CANVAS"
-    );
-
     /*
      * ─────────────────────────────────────────────
      * STATUS BAR

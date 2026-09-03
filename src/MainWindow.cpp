@@ -4,7 +4,7 @@
 
 #include <QWidget>
 #include <QFile>
-#include <QStackedLayout>
+#include <QHBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,20 +14,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     QWidget *central = new QWidget(this);
 
-    QStackedLayout *layout = new QStackedLayout(central);
-    layout->setStackingMode(QStackedLayout::StackAll);
+    QHBoxLayout *layout = new QHBoxLayout(central);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     canvas = new Canvas(central);
-    layout->addWidget(canvas);
 
     hud = new HUDWidget(canvas, central);
-    layout->addWidget(hud);
+    hud->setFixedWidth(400);
+
+    layout->addWidget(hud, 0);
+    layout->addWidget(canvas, 1);
 
     setCentralWidget(central);
-
-    hud->raise();
-    hud->show();
 
     connect(canvas, &Canvas::objectsChanged,
             hud, [this]()
@@ -35,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
         hud->update();
     });
 
-    QFile styleFile("assets/style.qss");
+    QFile styleFile("assets/styles/style.qss");
 
     if (styleFile.open(QFile::ReadOnly | QFile::Text))
     {

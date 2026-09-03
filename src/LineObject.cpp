@@ -28,3 +28,7 @@ void LineObject::moveBy(int dx, int dy){
     x2 += dx;
     y2 += dy;
 }
+QString LineObject::typeName() const
+{
+    return "Line";
+}

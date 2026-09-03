@@ -84,3 +84,7 @@ void RectangleObject::resizeBy(int dx, int dy,int handle){
     if (height < minSize)
         height = minSize;
 }
+QString RectangleObject::typeName() const
+{
+    return "Rectangle";
+}

@@ -10,6 +10,7 @@ class RectangleObject : public GraphicObject{
         void draw(QPainter& painter) override;
         bool contains(const QPoint& point) const override;
         int handleAt(const QPoint& point) const;
+        QString typeName() const override;
         void moveBy(int dx, int dy) override;
         void resizeBy(int dx, int dy,int handle);
     private:

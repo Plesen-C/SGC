@@ -23,6 +23,8 @@ add_executable(SGC
     src/GraphicObject.cpp
     src/HUDWidget.h
     src/HUDWidget.cpp
+    src/Scene.h
+    src/Scene.cpp
 )
 target_link_libraries(SGC
     PRIVATE Qt6::Widgets

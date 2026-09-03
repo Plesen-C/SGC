@@ -1,17 +1,41 @@
 #pragma once
+
+#include <cstdint>
+#include <QString>
+
 class QPainter;
 class QPoint;
 
-class GraphicObject {
-    public:
-        virtual ~GraphicObject() = default;
-        virtual void draw(QPainter& painter) = 0;
-        virtual bool contains(const QPoint& point) const = 0;
-        virtual void moveBy(int dx, int dy) = 0;
+using ObjectId = std::uint64_t;
 
-        void setSelected(bool value);
-        bool isSelected() const;
+class GraphicObject
+{
+public:
+    virtual ~GraphicObject() = default;
 
-    protected:
-        bool selected = false;
+    virtual void draw(QPainter& painter) = 0;
+    virtual bool contains(const QPoint& point) const = 0;
+    virtual void moveBy(int dx, int dy) = 0;
+
+    // Тип объекта
+    virtual QString typeName() const = 0;
+
+    // Выделение
+    void setSelected(bool value);
+    bool isSelected() const;
+
+    // ID
+    ObjectId id() const;
+
+    // Имя
+    const QString& name() const;
+    void setName(const QString& value);
+
+protected:
+    friend class Scene;
+
+    ObjectId objectId = 0;
+    QString objectName = "Object";
+
+    bool selected = false;
 };
